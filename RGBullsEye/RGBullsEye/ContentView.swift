@@ -37,39 +37,48 @@ struct ContentView: View {
     @State var guess: RGB
     @State var showScore = false
 
+    let circleSize: CGFloat = 0.275
+    let labelHeight: CGFloat = 0.06
+    let labelWidth: CGFloat = 0.53
+    let buttonWidth: CGFloat = 0.87
+
+
     var body: some View {
-        ZStack {
-            Color.element
-                .ignoresSafeArea()
-            VStack {
-                ColorCircle(rgb: game.target, size: 200)
-                if !showScore {
-                    BevelText(
-                        text: "R: ??? G: ??? B: ???", width: 200, height: 48)
-                } else {
-                    BevelText(
-                        text: game.target.intString, width: 200, height: 48)
-                }
-                ColorCircle(rgb: guess, size: 200)
-                BevelText(
-                    text: guess.intString, width: 200, height: 48)
-                ColorSlider(value: $guess.red, trackColor: .red)
-                ColorSlider(value: $guess.green, trackColor: .green)
-                ColorSlider(value: $guess.blue, trackColor: .blue)
-                Button("Hit Me!") {
-                    self.showScore = true
-                    self.game.check(guess: guess)
-                }
-                .buttonStyle(NeuButtonStyle(width: 327, height: 48))
-                    .alert(isPresented: $showScore) {
-                        Alert(
-                            title: Text("Your Score"),
-                            message: Text(String(game.scoreRound)),
-                            dismissButton: .default(Text("OK")) {
-                                self.game.startNewRound()
-                                self.guess = RGB()
-                            })
+        GeometryReader { proxy in
+            ZStack {
+                Color.element
+                    .ignoresSafeArea()
+                VStack {
+                    ColorCircle(rgb: game.target, size: proxy.size.height * circleSize)
+                    if !showScore {
+                        BevelText(
+                            text: "R: ??? G: ??? B: ???", width: proxy.size.width * labelWidth, height: proxy.size.height * labelHeight)
+                    } else {
+                        BevelText(
+                            text: game.target.intString, width: proxy.size.width * labelWidth, height: proxy.size.height * labelHeight)
                     }
+                    ColorCircle(rgb: guess, size: proxy.size.height * circleSize)
+                    BevelText(
+                        text: guess.intString, width: proxy.size.width * labelWidth, height: proxy.size.height * labelHeight)
+                    ColorSlider(value: $guess.red, trackColor: .red)
+                    ColorSlider(value: $guess.green, trackColor: .green)
+                    ColorSlider(value: $guess.blue, trackColor: .blue)
+                    Button("Hit Me!") {
+                        self.showScore = true
+                        self.game.check(guess: guess)
+                    }
+                    .buttonStyle(NeuButtonStyle(width: proxy.size.width * buttonWidth, height: proxy.size.height * labelHeight))
+                        .alert(isPresented: $showScore) {
+                            Alert(
+                                title: Text("Your Score"),
+                                message: Text(String(game.scoreRound)),
+                                dismissButton: .default(Text("OK")) {
+                                    self.game.startNewRound()
+                                    self.guess = RGB()
+                                })
+                        }
+                }
+                .font(.headline)
             }
         }
     }
@@ -77,7 +86,15 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(guess: RGB())
+        Group {
+            ContentView(guess: RGB())
+            .previewDevice("iPhone 8")
+            ContentView(guess: RGB())
+                .previewDevice("iPhone 13 Pro Max")
+
+        }
+           // .preferredColorScheme(.dark)
+
     }
 }
 
@@ -91,6 +108,7 @@ struct ColorSlider: View {
                 .accentColor(trackColor)
             Text("255")
         }
+        .font(.subheadline)
         .padding(.horizontal)
     }
 }
