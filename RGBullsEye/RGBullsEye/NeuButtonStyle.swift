@@ -32,26 +32,27 @@
 
 import SwiftUI
 
-extension View {
-    func northWestShadow(
-        radius: CGFloat = 16,
-        offset: CGFloat = 6
-    ) -> some View {
-        return self
-            .shadow(
-                color: .highlight, radius: radius, x: -offset, y: -offset)
-            .shadow(
-                color: .shadow, radius: radius, x: offset, y: offset)
-    }
+struct NeuButtonStyle: ButtonStyle {
+    let width: CGFloat
+    let height: CGFloat
 
-    func southEastShadow(
-        radius: CGFloat = 16,
-        offset: CGFloat = 6
-    ) -> some View {
-        return self
-            .shadow(
-                color: .highlight, radius: radius, x: offset, y: offset)
-            .shadow(
-                color: .shadow, radius: radius, x: -offset, y: -offset)
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+        // Move frame and background modifiers here
+            .opacity(configuration.isPressed ? 0.2 : 1)
+            .frame(width: width, height: height)
+            .background(
+                Group {
+                    if configuration.isPressed {
+                        Capsule()
+                            .fill(Color.element)
+                            .southEastShadow()
+                    } else {
+                        Capsule()
+                            .fill(Color.element)
+                            .northWestShadow()
+                    }
+                })
+            .northWestShadow()
     }
 }
